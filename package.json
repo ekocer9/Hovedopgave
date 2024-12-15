@@ -4,6 +4,13 @@
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "nodemon": "^3.1.7",
+    "prettier": "^3.4.2",
+    "scrappy": "^0.6.0",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16"
   }
 }

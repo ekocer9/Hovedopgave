@@ -1,7 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
 
 // Initialize the SQLite database
-const db = new sqlite3.Database('./anime_merchandise.db', (err) => {
+const path = require('path');
+const db = new sqlite3.Database(path.join(__dirname, 'anime_merchandise.db'), (err) => {
   if (err) {
     console.error('Error opening database:', err.message);
   } else {
@@ -47,27 +48,12 @@ const db = new sqlite3.Database('./anime_merchandise.db', (err) => {
           image_url TEXT,
           delivery_options TEXT,
           source_id INTEGER,
+          shop_id INTEGER, -- Add shop_id column
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (source_id) REFERENCES crawled (id)
+          FOREIGN KEY (source_id) REFERENCES crawled (id),
+          FOREIGN KEY (shop_id) REFERENCES shops (id) -- Set sop_id as foreign key
       )
-    `, (err) => {
-      if (err) {
-        console.error('Error creating products table:', err.message);
-      } else {
-        console.log('Products table created or already exists.');
-
-        // Add the scraped column only after the products table exists
-        db.run(`
-          ALTER TABLE products ADD COLUMN scraped INTEGER DEFAULT 0;
-        `, (err) => {
-          if (err) {
-            console.log('Column "scraped" already exists or cannot be added:', err.message);
-          } else {
-            console.log('Column "scraped" added successfully.');
-          }
-        });
-      }
-    });
+    `);
   }
 });
 
