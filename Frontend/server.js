@@ -4,32 +4,35 @@ const path = require('path');
 const app = express();
 const PORT = 4000;
 
-// Serve static files from the 'public' directory
+// Middleware to parse JSON data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files (CSS, JS, images) from 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Handle requests for components dynamically
-app.get('/src/components/:component', (req, res) => {
-  const { component } = req.params;
-  const filePath = path.join(__dirname, 'src', 'components', component);
-  
-  console.log(`Serving component: ${component}`);
-  console.log(`Resolved file path: ${filePath}`);
-  
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.error(`Failed to load component: ${component}`, err);
-      res.status(404).send('Component not found');
-    }
-  });
+// Serve components dynamically from 'components' folder
+app.use('/components', express.static(path.join(__dirname, 'components')));
+
+// Routes for pages
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'index.html'));
 });
 
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'login.html'));
+});
 
-// Fallback to index.html for other routes
+app.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'signup.html'));
+});
+
+// Catch-all route for unmatched routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'pages', 'index.html'));
 });
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Frontend server is running on http://localhost:${PORT}`);
+  console.log(`Frontend server is running at http://localhost:${PORT}`);
 });

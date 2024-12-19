@@ -2,9 +2,19 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
 
 const app = express();
 const PORT = 3000;
+
+app.use(session({
+  store: new SQLiteStore(),
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 1 day
+}));
 
 // Middleware
 app.use(cors());
@@ -13,10 +23,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use('/products', require('./routes/products'));
-app.use('/shops', require('./routes/shops'));
+app.use('/users', require('./routes/users'));
 //app.use('/categories', require('./routes/categories')); // For categories
-//app.use('/collections', require('./routes/collections')); // For collections
-//app.use('/crawled', require('./routes/crawled')); // For crawled URLs
 
 // Serve static files (e.g., frontend files, if any)
 app.use(express.static(path.join(__dirname, 'frontend')));

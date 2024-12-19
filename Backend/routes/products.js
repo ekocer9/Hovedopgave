@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database/db.js'); // Adjust the path to your database connection if needed
+const db = require('../database/db.js');
 
 // Get all products
 router.get('/', (req, res) => {
@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
       products.description, 
       products.product_url, 
       products.image_url,
-      products.delivery_options, 
+      product_type TEXT,
       products.created_at, 
       shops.name AS shop_name, 
       shops.website_url AS shop_website

@@ -2,39 +2,77 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import sqlite3
+from urllib.parse import urlsplit
+from urllib.parse import urlparse, urlunparse
 
 # Database connection
 DB_PATH = r'C:\Users\Enes\Coding\Hovedopgave\Backend\database\anime_merchandise.db'  # Adjust path if needed
 
-def save_crawled_data(urls, collection_name):
+def is_image_link(url):
+    """
+    Check if a URL points to an image file by inspecting its extension.
+    """
+    try:
+        # Parse URL and remove query parameters
+        path = urlsplit(url).path
+        return any(path.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"])
+    except Exception:
+        return False
+
+def normalize_product_url(url):
+    """
+    Normalize product URL by removing collection-specific paths or query strings.
+    Example:
+        Input: https://aniqi.com/collections/shirts/products/limited-tee
+        Output: https://aniqi.com/products/limited-tee
+    """
+    parsed_url = urlparse(url)
+    path_parts = parsed_url.path.split("/")
+
+    # Keep only base URL and /products/... endpoint
+    if "products" in path_parts:
+        product_index = path_parts.index("products")
+        normalized_path = "/".join(path_parts[:product_index + 2])  # Keep up to /products/slug
+    else:
+        normalized_path = parsed_url.path
+
+    # Reconstruct normalized URL
+    normalized_url = urlunparse((parsed_url.scheme, parsed_url.netloc, normalized_path, "", "", ""))
+    return normalized_url
+
+def save_crawled_data(urls):
+    """
+    Save crawled URLs to the database after normalizing and filtering duplicates.
+    """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     for url in urls:
-        cursor.execute("SELECT 1 FROM crawled WHERE url = ?", (url,))
+        # Normalize URL to remove collection-specific paths
+        normalized_url = normalize_product_url(url)
+
+        cursor.execute("SELECT 1 FROM crawled WHERE url = ?", (normalized_url,))
         if cursor.fetchone():
-            print(f"URL already exists, skipping: {url}")
+            print(f"URL already exists, skipping: {normalized_url}")
         else:
             try:
                 cursor.execute("""
-                    INSERT INTO crawled (url, collection_name, status)
-                    VALUES (?, ?, ?)
-                """, (url, collection_name, 'pending'))
-                print(f"Saved crawled URL: {url}")
+                    INSERT INTO crawled (url) VALUES (?)
+                """, (normalized_url,))
+                print(f"Saved crawled URL: {normalized_url}")
             except sqlite3.IntegrityError:
-                print(f"Duplicate URL skipped: {url}")
+                print(f"Duplicate URL skipped: {normalized_url}")
 
     conn.commit()
     conn.close()
 
-def crawl_products_from_collection(collection_url, base_url, collection_name, visited_collections):
+def crawl_products_from_collection(collection_url, base_url, visited_collections):
     """
     Crawl all product links within a specific collection and save them to the database.
-    
+
     Args:
         collection_url (str): The URL of the collection page.
         base_url (str): The base URL of the website.
-        collection_name (str): The name of the collection.
         visited_collections (set): A set of already visited collection URLs.
 
     Returns:
@@ -63,9 +101,13 @@ def crawl_products_from_collection(collection_url, base_url, collection_name, vi
             if any(social in href for social in ["pinterest.com", "facebook.com", "twitter.com"]):
                 continue
 
-             # Exclude image links
-            if any(href.lower().endswith(ext) for ext in [".jpg", ".png", ".gif", ".jpeg", ".webp"]):
+            # Exclude image links
+            if is_image_link(full_url):
                 print(f"Skipping image link: {full_url}")
+                continue
+
+            if "exclusive" in href.lower() or "member" in href.lower():
+                print(f"Skipping member-exclusive product: {full_url}")
                 continue
 
             # Detect product links with flexible logic
@@ -79,11 +121,11 @@ def crawl_products_from_collection(collection_url, base_url, collection_name, vi
                     collection_links.append(full_url)
 
         print(f"Found {len(product_links)} products in collection: {collection_url}")
-        save_crawled_data(product_links, collection_name)
+        save_crawled_data(product_links)
 
         # Recursively crawl nested collections
         for nested_collection in collection_links:
-            crawl_products_from_collection(nested_collection, base_url, collection_name, visited_collections)
+            crawl_products_from_collection(nested_collection, base_url, visited_collections)
 
         return product_links
 
@@ -92,6 +134,9 @@ def crawl_products_from_collection(collection_url, base_url, collection_name, vi
         return []
 
 def crawl_collections(base_url):
+    """
+    Start crawling the collections from the homepage.
+    """
     try:
         response = requests.get(base_url, timeout=10)
         response.raise_for_status()
@@ -110,8 +155,7 @@ def crawl_collections(base_url):
         print(f"Found {len(collection_links)} collections on homepage: {base_url}")
 
         for collection_url in collection_links:
-            collection_name = collection_url.split("/")[-1]
-            crawl_products_from_collection(collection_url, base_url, collection_name, visited_collections)
+            crawl_products_from_collection(collection_url, base_url, visited_collections)
 
     except requests.exceptions.RequestException as e:
         print(f"Error crawling homepage {base_url}: {e}")
