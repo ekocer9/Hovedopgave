@@ -1,37 +1,25 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const path = require('path');
-const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session);
+require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+app.use(express.static('public'));
 
-app.use(session({
-  store: new SQLiteStore(),
-  secret: 'your-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 1 day
-}));
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use('/products', require('./routes/products'));
 app.use('/users', require('./routes/users'));
-//app.use('/categories', require('./routes/categories')); // For categories
 
-// Serve static files (e.g., frontend files, if any)
-app.use(express.static(path.join(__dirname, 'frontend')));
 
 // Test route
 app.get('/', (req, res) => {
-  res.send('Backend is running!');
+  res.send('Backend is running!'); 
 });
 
 // Error handling middleware

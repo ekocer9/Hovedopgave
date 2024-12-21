@@ -1,30 +1,31 @@
 <nav class="flex items-center justify-between px-6 py-4 shadow-md bg-white h-16">
   <!-- Logo -->
   <a href="/">
-    <img src="assets/images/horizontal-logo-edited.png" alt="Merchiverse Logo" class="h-20 w-auto" />
+    <img src="../assets/images/horizontal-logo-edited.png" alt="Merchiverse Logo" class="h-20 w-auto" />
   </a>
 
   <!-- Links -->
   <ul class="hidden md:flex space-x-6 text-gray-700 font-medium">
     <li><a href="#" class="hover:text-gray-900">Alle kategorier</a></li>
-    <li><a href="#" class="hover:text-gray-900">Om os</a></li>
+    <li><a href="/aboutus" class="hover:text-gray-900">Om os</a></li>
   </ul>
 
   <!-- Search Bar -->
-  <div class="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2">
+  <form id="search-form" class="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2">
     <span class="text-gray-400">🔍</span>
     <input 
       type="text" 
+      id="search-bar"
       placeholder="Hvad kan vi hjælpe med i dag?" 
       class="ml-2 bg-transparent outline-none text-sm text-gray-600"
     />
-  </div>
+  </form>
 
-  <div class="flex space-x-4">
+  <div id="navbar-buttons" class="flex space-x-4">
     <!-- Login Button -->
     <a href="/login" 
        class="text-gray-700 font-medium border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-100 transition duration-200">
-      Log ind
+      Log in
     </a>
   
     <!-- Signup Button -->

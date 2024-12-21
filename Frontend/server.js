@@ -27,6 +27,19 @@ app.get('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'signup.html'));
 });
 
+app.get('/profile', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'profile.html'));
+});
+
+// Product route
+app.get('/product/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'product.html'));
+});
+
+app.get('/aboutus', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'aboutus.html'));
+});
+
 // Catch-all route for unmatched routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'index.html'));

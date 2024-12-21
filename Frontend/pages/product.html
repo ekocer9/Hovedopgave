@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details</title>
+  <link href="/style.css" rel="stylesheet">
+  <script src="/script.js"></script>
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+
+  <!-- Navbar -->
+  <div id="navbar"></div>
+
+  <!-- Product Details -->
+  <main class="flex-grow container mx-auto px-6 py-12">
+    <div id="product-details" class="bg-white p-6 rounded-lg shadow-lg"></div>
+  </main>
+
+  <!-- Footer -->
+  <div id="footer"></div>
+
+</body>
+</html>
+
+<script>
+async function loadProductDetails() {
+  const productId = window.location.pathname.split('/').pop(); // Extract product ID from URL
+  const productDetails = document.getElementById('product-details');
+
+  try {
+    // Use the full backend URL to ensure the request reaches the backend
+    const response = await fetch(`http://localhost:3000/products/${productId}`, {
+      headers: {
+        'Content-Type': 'application/json', // Ensure proper content type
+      },
+    });
+    if (!response.ok) throw new Error('Failed to fetch product details.');
+
+    const product = await response.json();
+    console.log('Product fetched:', product); // Debug log
+
+    // Generate the product details HTML dynamically
+    productDetails.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Product Image -->
+        <div class="flex justify-center">
+          <img src="${product.image_url}" alt="${product.name}" class="rounded-lg shadow-md w-full max-w-md object-cover">
+        </div>
+        <!-- Product Info -->
+        <div>
+          <h2 class="text-3xl font-bold mb-4">${product.name}</h2>
+          <p class="text-gray-600 mb-4">Shop: <a href="${product.shop_website}" class="text-blue-500 hover:underline">${product.shop_name}</a></p>
+          <p class="text-gray-600 mb-4">Price: <span class="text-green-500 font-bold">$${product.price.toFixed(2)}</span></p>
+          <p class="text-gray-600 mb-6">${product.description}</p>
+          <div class="flex space-x-4">
+            <a href="http://localhost:3000/products/redirect/${product.id}" target="_blank"
+               class="px-6 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600">
+              Visit Product Website
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (error) {
+    console.error('Error loading product details:', error);
+    productDetails.innerHTML = `<p class="text-red-500">Failed to load product details. Please try again later.</p>`;
+  }
+}
+
+
+  // Load components and product details
+  loadProductDetails();
+</script>

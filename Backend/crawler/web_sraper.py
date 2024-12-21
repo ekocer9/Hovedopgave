@@ -394,7 +394,7 @@ def scrape_all_products(websites_file):
         LEFT JOIN products p ON c.url = p.product_url
         WHERE p.product_url IS NULL  -- Ensures the product hasn't been scraped yet
         ORDER BY RANDOM()
-        LIMIT 1
+        LIMIT 15
     """)
 
     crawled_data = cursor.fetchall()

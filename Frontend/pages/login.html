@@ -50,34 +50,36 @@
 </html>
 
 <script>
-  document.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
+document.querySelector('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
 
-    try {
-      const response = await fetch('http://localhost:3000/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const response = await fetch('http://localhost:3000/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(result.message);
-        // Store user info in local storage (optional)
-        localStorage.setItem('user', JSON.stringify(result.user));
-        window.location.href = '/'; // Redirect to homepage or dashboard
-      } else {
-        alert(`Error: ${result.error}`);
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      alert('An unexpected error occurred. Please try again later.');
+    if (!response.ok) {
+      const error = await response.json();
+      alert(`Error: ${error.error || 'Failed to log in'}`);
+      return;
     }
-  });
 
+    const result = await response.json();
+    alert(result.message);
+
+    // Store JWT token securely (prefer sessionStorage for temporary storage)
+    sessionStorage.setItem('token', result.token);
+
+    // Redirect to index.html
+    window.location.href = '/';
+  } catch (err) {
+    console.error('Login error:', err);
+    alert('An unexpected error occurred. Please try again later.');
+  }
+});
 </script>
