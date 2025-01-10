@@ -388,6 +388,7 @@ def scrape_all_products(websites_file):
     cursor = conn.cursor()
 
     # Step 2: Fetch unscraped products from the `crawled` table
+    # Juster LIMIT til det antal produkter den skal scrape
     cursor.execute("""
         SELECT c.id, c.url
         FROM crawled c
