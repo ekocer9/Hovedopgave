@@ -20,5 +20,20 @@
   },
   "scripts": {
     "build:css": "npx tailwindcss -i ./frontend/src/styles.css -o ./frontend/public/style.css --watch"
-  }
+  },
+  "name": "hovedopgave",
+  "version": "1.0.0",
+  "description": "Welcome to **Merchiverse**, an anime merchandise affiliate platform that connects otaku fans with the best merchandise across various stores. This platform offers a seamless shopping experience, showcasing products from small businesses and established stores, all in one place.",
+  "main": "postcss.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekocer9/Hovedopgave.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekocer9/Hovedopgave/issues"
+  },
+  "homepage": "https://github.com/ekocer9/Hovedopgave#readme"
 }

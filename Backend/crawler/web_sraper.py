@@ -15,7 +15,7 @@ from categories import PRODUCT_CATEGORIES
 
 
 # Database path
-DB_PATH = 'C:/Users/Enes/Coding/Hovedopgave/Backend/database/anime_merchandise.db'
+DB_PATH = r'C:\Users\enes0\Coding\Hovedopgave\Hovedopgave\Backend\database\anime_merchandise.db'
 
 def normalize_url(url):
     """
